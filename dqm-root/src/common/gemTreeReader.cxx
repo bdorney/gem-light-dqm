@@ -13,7 +13,7 @@
 #include <TTreeReaderArray.h>
 
 
-#include <iomanip> 
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -29,7 +29,7 @@ class gemTreeReader: public TSelector {
 public :
   TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    TTreeReader     fReader;  //!the tree reader
-  
+
    // Readers to access the data (delete the ones you do not need).
    TTreeReaderValue<unsigned int> fUniqueID = {fReader, "fUniqueID"};
    TTreeReaderValue<unsigned int> fBits = {fReader, "fBits"};
@@ -122,7 +122,7 @@ void gemTreeReader::Begin(TTree * /*tree*/)
 
   if (DEBUG) std::cout << "MASTER BEGIN"<< std::endl;
   TString option = GetOption();
-} 
+}
 
 void gemTreeReader::SlaveBegin(TTree * /*tree*/)
 {
@@ -149,7 +149,7 @@ void gemTreeReader::SlaveBegin(TTree * /*tree*/)
                                     " instance is invalid!", fProofFile->GetName());
      Abort(amsg, kAbortProcess);
      return;
-  } 
+  }
   fFile->cd();
 
   //VFATMap = {{{0}}};
@@ -184,7 +184,7 @@ void gemTreeReader::SlaveBegin(TTree * /*tree*/)
 
   //TIter nextamc(config_s);
   //TObject *amc;
-  //while ((amc = nextamc())) 
+  //while ((amc = nextamc()))
   //{
   //  std::cout << "Slave Begin: found object " << amc->GetName() << std::endl;
   //  TString a_slot_s = (TString) amc->GetName();
@@ -194,7 +194,7 @@ void gemTreeReader::SlaveBegin(TTree * /*tree*/)
   //  m_amcH->bookHistograms();
   //  TIter nextgeb((TList*)amc);
   //  TObject *geb;
-  //  while ((geb = nextgeb())) 
+  //  while ((geb = nextgeb()))
   //  {
   //    std::cout << "Slave Begin: found object " << geb->GetName() << std::endl;
   //    TString g_slot_s = (TString)geb->GetName();
@@ -208,7 +208,7 @@ void gemTreeReader::SlaveBegin(TTree * /*tree*/)
   //    m_gebH->bookHistograms();
   //    TMapIter nextvfat((TMap*)geb);
   //    TPair *vfat;
-  //    while ((vfat = (TPair*)nextvfat())) 
+  //    while ((vfat = (TPair*)nextvfat()))
   //    {
   //      //TObject *chipID_s = ((TPair*)geb->FindObject(vfat))->Value();
   //      TString v_slot_s = (TString)vfat->GetName();
@@ -270,8 +270,9 @@ Bool_t gemTreeReader::Process(Long64_t entry)
       if (DEBUG) cout << "Fill AMC histograms"<< endl;
       m_RunType = a->Rtype();
       if (m_RunType){
-        m_deltaV = a->Param2() - a->Param1();
-        m_Latency = a->Param3();
+        //m_deltaV = a->Param2() - a->Param1();
+        //m_Latency = a->Param3();
+        m_Latency = a->Param1();
       }
       //if ( (m_Latency > 166) && (m_Latency < 172) ) {continue;}
       g_c=0;
@@ -301,7 +302,8 @@ Bool_t gemTreeReader::Process(Long64_t entry)
           if (slot>-1) {v_vfatH = v_gebH->vfatsH(slot);} else { continue;}
           if (v_vfatH) {
             v_vfatH->fillHistograms(&*v, m_RelOrbitNumber);
-            if (m_RunType == 1 || m_RunType == 2 || m_RunType == 3){
+            //if (m_RunType == 1 || m_RunType == 2 || m_RunType == 3){
+            if (m_RunType == 3){
               v_vfatH->fillScanHistograms(&*v, m_RunType, m_deltaV, m_Latency);
             }
           }
