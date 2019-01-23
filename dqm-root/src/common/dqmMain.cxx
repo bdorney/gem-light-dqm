@@ -35,7 +35,7 @@ TList *getConfig(string filename)
   AMC13Query += "'";
 
   string RunIDstr = stringFromChar(simpleDBQuery(Database, AMC13Query));
-  
+
   string AMCQuery = "select amc_id from ldqm_db_run_amcs where run_id like '"+RunIDstr+"'";
   vector<string> AMCs = manyDBQuery(Database,AMCQuery);
   if (DEBUG) cout << "Number of AMCs: " << AMCs.size() << endl;
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
   gProofDebugMask = TProofDebug::kAll;
   gProofDebugLevel = 5;
   std::cout << "--==DQM Main==--" << endl;
-  if (argc<2) 
+  if (argc<2)
     {
       cout << "Please provide input filenames" << endl;
       cout << "Usage: <path>/rundqm inputFile.root" << endl;
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
   if (tmp != ".raw.root") throw std::runtime_error("Wrong input filename (should end with '.raw.root'): "+ifilename);
   ofilename = ifilename.substr(0,ifilename.size()-9);
   ofilename += ".analyzed.root";
- 
+
   gSystem->Load("libEvent.so");
   TChain *ch = new TChain ("GEMtree","chain");
   ch->Add(ifilename.c_str());
@@ -132,8 +132,15 @@ int main(int argc, char** argv)
   TList * m_config = new TList();
   //m_config = getConfig(ifilename);
 
-  TProof::Open("workers=4");
+  cout<<"=============================================================================="<<endl;
+  cout<<"Setting number of workers"<<endl;
+  cout<<"=============================================================================="<<endl;
+  //TProof::Open("workers=4");
+  TProof::Open("workers=3");
   //gProof->AddInput(m_config);
+  cout<<"=============================================================================="<<endl;
+  cout<<"Setting PROOF Input"<<endl;
+  cout<<"=============================================================================="<<endl;
   gProof->AddInput(new TNamed("PROOF_OUTPUTFILE", ofilename.c_str()));
   gProof->GetInputList()->Print();
   ch->SetProof();;
@@ -141,9 +148,18 @@ int main(int argc, char** argv)
   string path;
   sel = getenv("BUILD_HOME");
   path = sel+"/gem-light-dqm/proof_packages/gemevent.par";
+  cout<<"=============================================================================="<<endl;
+  cout<<"Uploading Package: " << path.c_str() << endl;
+  cout<<"=============================================================================="<<endl;
   gProof->UploadPackage(path.c_str());
   gProof->ShowPackages(kTRUE);
+  cout<<"=============================================================================="<<endl;
+  cout<<"Enabling Package"<<endl;
+  cout<<"=============================================================================="<<endl;
   gProof->EnablePackage("gemevent");
+  cout<<"=============================================================================="<<endl;
+  cout<<"Showing Package"<<endl;
+  cout<<"=============================================================================="<<endl;
   gProof->ShowPackages(kTRUE);
 
   path = sel+"/gem-light-dqm/dqm-root/include";
@@ -156,6 +172,15 @@ int main(int argc, char** argv)
   gSystem->SetIncludePath("-I$BUILD_HOME/gem-light-dqm/dqm-root/include -I$BUILD_HOME/gem-light-dqm/dqm-root/src/common -I$BUILD_HOME/gem-light-dqm/gemtreewriter/include");
 
   sel += "/gem-light-dqm/dqm-root/src/common/gemTreeReader.cxx++g";
+
+  cout<<"=============================================================================="<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<"Launching Process"<<endl;
+  cout<<endl;
+  cout<<endl;
+  cout<<"=============================================================================="<<endl;
+
   ch->Process(sel.c_str());
   //TProofLite::Mgr("__lite__")->GetSessionLogs()->Display("*");
 
