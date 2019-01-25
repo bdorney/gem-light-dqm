@@ -28,6 +28,7 @@ public:
     Header     = new TH1F("Header", "Header", 32,  0x0 , 0xff);
     SlotN    = new TH1F("SlotN", "Slot Number", 24,  0, 24);
     FiredChannels = new TH1F("FiredChannels", "FiredChannels", 128, -0.5, 127.5);
+    FiredChannelsVsL1AID = new TH2I("FiredChannelsVsL1AID", "FiredChannels Vs. L1AID", 1e6, 0, 1e6, 128, -0.5, 127.5);
     FiredStrips   = new TH1F("FiredStrips",   "FiredStrips",   128, -0.5, 127.5);
     crc      = new TH1F("crc", "check sum value", 0xffff,  0x0 , 0xffff);
     crc_calc = new TH1F("crc_calc", "check sum value recalculated", 0xffff,  0x0 , 0xffff);
@@ -61,7 +62,7 @@ public:
   /*!
     This fills histograms for the following data: Difference between crc and recalculated crc, Control Bit 1010, Control Bit 1100, Control Bit 1110, Bunch Crossing Number, Event Counter, Control Flags, and Chip ID, and Fired Channels
   */
-  void fillHistograms(VFATdata * vfat, long long int orbitNumber){
+  void fillHistograms(VFATdata * vfat, long long int orbitNumber, uint32_t l1aID){
     //setVFATBlockWords(vfat);
     //int crc_diff = vfat->crc()-checkCRC(vfatBlockWords);
     //if (crc_diff != 0) crc_difference->Fill(crc_diff);
@@ -88,6 +89,7 @@ public:
 	if(chan0xf) {
           n_hits_fired++;
 	  FiredChannels->Fill(chan);
+      FiredChannelsVsL1AID->Fill(l1aID,chan);
 	  FiredStrips->Fill(m_strip_map[chan]);
 	}
       } else {
@@ -95,6 +97,7 @@ public:
 	if(chan0xf) {
           n_hits_fired++;
 	  FiredChannels->Fill(chan);
+      FiredChannelsVsL1AID->Fill(l1aID,chan);
 	  FiredStrips->Fill(m_strip_map[chan]);
 	}
       }
@@ -167,6 +170,7 @@ private:
   //TH1F* b1110;            ///<Histogram for contorl bit 1110
   //TH1F* ChipID;           ///<Histogram for Chip ID
   TH1F* FiredChannels;    ///<Histogram for Fired Channels (uses lsData and fmData)
+  TH2I* FiredChannelsVsL1AID;    ///<Histogram for Fired Channels (uses lsData and fmData) versus L1A_ID
   TH1F* crc_difference;   ///<Histogram for difference of crc and recalculated crc
   TH1F* SlotN;
   TH1F* FiredStrips;
